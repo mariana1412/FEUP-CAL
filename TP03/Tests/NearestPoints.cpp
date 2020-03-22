@@ -66,7 +66,22 @@ Result nearestPoints_BF(vector<Point> &vp) {
 Result nearestPoints_BF_SortByX(vector<Point> &vp) {
 	Result res;
 	sortByX(vp, 0, vp.size()-1);
-	// TODO
+
+    int size = vp.size();
+
+    for(int i = 0; i < size; i++){
+        for(int j = i + 1; j < size; j++){
+
+            double dist = (vp.at(i)).distance(vp.at(j));
+
+            if(dist < res.dmin){
+                res.p1 = vp.at(i);
+                res.p2 = vp.at(j);
+                res.dmin = dist;
+            }
+        }
+    }
+
 	return res;
 }
 
