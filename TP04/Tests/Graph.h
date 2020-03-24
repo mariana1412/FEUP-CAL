@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <queue>
+#include <list>
 using namespace std;
 
 template <class T> class Edge;
@@ -29,7 +30,7 @@ public:
 
 template <class T>
 class Edge {
-	Vertex<T> * dest;      // destination vertex
+	Vertex<T> *dest;      // destination vertex
 	double weight;         // edge weight
 public:
 	Edge(Vertex<T> *d, double w);
@@ -108,10 +109,14 @@ bool Graph<T>::addVertex(const T &in) {
  */
 template <class T>
 bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
-	// TODO (6 lines)
-	// HINT: use findVertex to obtain the actual vertices
-	// HINT: use the next function to actually add the edge
-	return false;
+	Vertex<T> *s = findVertex(sourc), *d = findVertex(dest);
+
+    if(s == NULL || (d == NULL))
+        return false;
+
+    s->addEdge(d, w);
+
+	return true;
 }
 
 /*
@@ -120,7 +125,7 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
  */
 template <class T>
 void Vertex<T>::addEdge(Vertex<T> *d, double w) {
-	// TODO (1 line)
+	this->adj.push_back(Edge<T>(d, w));
 }
 
 
@@ -133,10 +138,14 @@ void Vertex<T>::addEdge(Vertex<T> *d, double w) {
  */
 template <class T>
 bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
-	// TODO (5 lines)
-	// HINT: Use "findVertex" to obtain the actual vertices.
-	// HINT: Use the next function to actually remove the edge.
-	return false;
+
+
+    Vertex<T> *s = findVertex(sourc), *d = findVertex(dest);
+
+    if(s == NULL || (d == NULL))
+        return false;
+
+    return s->removeEdgeTo(d);
 }
 
 /*
@@ -146,9 +155,18 @@ bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
  */
 template <class T>
 bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
-	// TODO (6 lines)
-	// HINT: use an iterator to scan the "adj" vector and then erase the edge.
-	return false;
+
+    typename vector<Edge<T>>::iterator it = adj.begin();
+
+    while (it != adj.end()) {
+        if ((*it).dest == d) {
+            adj.erase(it);
+            return true;
+        }
+        it++;
+    }
+
+    return false;
 }
 
 
@@ -161,9 +179,27 @@ bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
  */
 template <class T>
 bool Graph<T>::removeVertex(const T &in) {
-	// TODO (10 lines)
-	// HINT: use an iterator to scan the "vertexSet" vector and then erase the vertex.
+
 	// HINT: take advantage of "removeEdgeTo" to remove incoming edges.
+
+    Vertex<T> *s = findVertex(in);
+
+    typename vector<Vertex<T>*>::iterator it = vertexSet.begin(), aux = vertexSet.end(); //use an iterator to scan the "vertexSet" vector and then erase the vertex.
+
+    while(it != vertexSet.end() && (s != NULL)){
+
+        if((*it)->info == in)
+            aux = it;
+
+        (*it)->removeEdgeTo(s);
+        it++;
+    }
+
+    if(aux != vertexSet.end()){
+        vertexSet.erase(aux);
+        return true;
+    }
+
 	return false;
 }
 
@@ -175,11 +211,20 @@ bool Graph<T>::removeVertex(const T &in) {
  * Returns a vector with the contents of the vertices by dfs order.
  * Follows the algorithm described in theoretical classes.
  */
+
 template <class T>
 vector<T> Graph<T>::dfs() const {
-	// TODO (7 lines)
-	vector<T> res;
-	return res;
+
+    vector<T> res;
+    for(Vertex<T> *vertex:this->vertexSet){
+        vertex->visited=false;
+    }
+    for(Vertex<T> *vertex:this->vertexSet){
+        if(!vertex->visited)
+            dfsVisit(vertex,res);
+    }
+    return res;
+
 }
 
 /*
@@ -188,7 +233,15 @@ vector<T> Graph<T>::dfs() const {
  */
 template <class T>
 void Graph<T>::dfsVisit(Vertex<T> *v, vector<T> & res) const {
-	// TODO (7 lines)
+
+    v->visited = true;
+    res.push_back(v->info);
+
+    for(Edge<T> w:v->adj){
+        if(!w.dest->visited)
+            dfsVisit(w.dest, res);
+    }
+
 }
 
 /****************** 2b) bfs ********************/
@@ -201,10 +254,30 @@ void Graph<T>::dfsVisit(Vertex<T> *v, vector<T> & res) const {
  */
 template <class T>
 vector<T> Graph<T>::bfs(const T & source) const {
-	// TODO (22 lines)
-	// HINT: Use the flag "visited" to mark newly discovered vertices .
-	// HINT: Use the "queue<>" class to temporarily store the vertices.
+
 	vector<T> res;
+    queue<Vertex<T>*> q;
+
+    for(Vertex<T> *vertex:this->vertexSet){
+        vertex->visited=false;
+    }
+
+    Vertex<T> *vertex= findVertex(source);
+    q.push(vertex);
+    vertex->visited = true;
+
+    while(!q.empty()){
+        vertex = q.front();
+        q.pop();
+        res.push_back(vertex->info);
+        for(Edge<T> w: vertex->adj){
+            if(!w.dest->visited){
+                q.push(w.dest);
+                w.dest->visited = true;
+            }
+        }
+    }
+
 	return res;
 }
 
@@ -219,8 +292,49 @@ vector<T> Graph<T>::bfs(const T & source) const {
 
 template<class T>
 vector<T> Graph<T>::topsort() const {
-	// TODO (26 lines)
 	vector<T> res;
+
+    for(Vertex<T> *vertex: vertexSet){
+        vertex->indegree=0;
+    }
+
+    for(Vertex<T> *vertex: vertexSet){
+        for(Edge<T> w: vertex->adj){
+            w.dest->indegree += 1;
+        }
+    }
+
+    queue<Vertex<T>*> c;
+
+    for(Vertex<T> *vertex:this->vertexSet){
+        if(vertex->indegree == 0){
+           c.push(vertex);
+        }
+    }
+
+    list<Vertex<T>*> t;
+    Vertex<T> *vertex;
+
+   while(!c.empty()){
+       vertex = c.front();
+       c.pop();
+       t.push_back(vertex);
+       res.push_back(vertex->info);
+
+       for(Edge<T> w: vertex->adj){
+           w.dest->indegree -= 1;
+
+           if(w.dest->indegree == 0)
+               c.push(w.dest);
+
+       }
+   }
+
+   if(t.size() != vertexSet.size()){
+       cout << "O grafo tem ciclos!\n";
+       res.clear();
+   }
+
 	return res;
 }
 
