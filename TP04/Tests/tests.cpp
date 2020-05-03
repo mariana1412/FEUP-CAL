@@ -31,7 +31,8 @@ void createNetwork(Graph<Person> & net1)
 }
 
 TEST(CAL_FP04, test_addVertex) {
-     //uncomment test body below!
+
+
     Graph<Person> net1;
     Person p1("Ana",19);
     Person p2("Carlos",33);
@@ -45,7 +46,7 @@ TEST(CAL_FP04, test_addVertex) {
 }
 
 TEST(CAL_FP04, test_removeVertex) {
-    //uncomment test body below!
+
     Graph<Person> net1;
     Person p1("Ana",19);
     Person p2("Carlos",33);
@@ -60,7 +61,7 @@ TEST(CAL_FP04, test_removeVertex) {
 }
 
 TEST(CAL_FP04, test_addEdge) {
-    //uncomment test body below!
+
     Graph<Person> net1;
     Person p1("Ana",19);
     Person p2("Carlos",33);
@@ -77,7 +78,7 @@ TEST(CAL_FP04, test_addEdge) {
 }
 
 TEST(CAL_FP04, test_removeEdge) {
-    //uncomment test body below!
+
     Graph<Person> net1;
     Person p1("Ana",19);
     Person p2("Carlos",33);
@@ -97,7 +98,7 @@ TEST(CAL_FP04, test_removeEdge) {
 }
 
 TEST(CAL_FP04, test_dfs) {
-    //uncomment test body below!
+
     Graph<Person> net1;
     createNetwork(net1);
     vector<Person> v1 = net1.dfs();
@@ -111,7 +112,7 @@ TEST(CAL_FP04, test_dfs) {
 }
 
 TEST(CAL_FP04, test_bfs) {
-    //uncomment test body below!
+
     Graph<Person> net1;
     createNetwork(net1);
     vector<Person> v1 = net1.bfs(Person("Ana",19));
@@ -125,7 +126,7 @@ TEST(CAL_FP04, test_bfs) {
 }
 
 TEST(CAL_FP04, test_removeVertex_Again) {
-    //uncomment test body below!
+
     Graph<Person> net1;
     createNetwork(net1);
     Person p2("Carlos",33);
@@ -138,7 +139,7 @@ TEST(CAL_FP04, test_removeVertex_Again) {
 }
 
 TEST(CAL_FP04, test_removeEdge_Again) {
-     //uncomment test body below!
+
     Graph<Person> net1;
     createNetwork(net1);
     Person p5("Maria", 24);
@@ -205,11 +206,11 @@ TEST(CAL_FP04, test_isDAG) {
     myGraph.addEdge(1, 4, 0);
 
     EXPECT_EQ(true, myGraph.isDAG());
-    */
+     */
 }
 
 TEST(CAL_FP04, test_topsort) {
-     //uncomment test body below!
+
     Graph<int> myGraph;
     myGraph.addVertex(1); myGraph.addVertex(2); myGraph.addVertex(3); myGraph.addVertex(4);
     myGraph.addVertex(5); myGraph.addVertex(6); myGraph.addVertex(7);
